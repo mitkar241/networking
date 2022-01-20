@@ -23,7 +23,7 @@ options {
 	listen-on-v6 { any; };
 	
 	recursion yes;
-	listen-on {192.168.0.8;};
+	listen-on {192.168.0.5;};
 	allow-transfer {none;};
 
 	forwarders {
