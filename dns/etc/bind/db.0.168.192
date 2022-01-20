@@ -1,0 +1,16 @@
+;
+; BIND reverse data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	ns1.mitkar.io. root.mitkar.io. (
+			      1		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.mitkar.io.
+8	IN	PTR	ns1.mitkar.io.
+8       IN      PTR     www.mitkar.io.
+8       IN      PTR     ftp.mitkar.io.
+8       IN      PTR     mail.mitkar.io.
