@@ -1,0 +1,191 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+=begin
+@description: Vagrantfile to deploy with custom user and no vagrant user
+@resources:
+  - https://www.virtualbox.org/manual/ch08.html#vboxmanage-cmd-overview
+gsettings get | set | reset
+gsettings list-schemas
+gsettings list-recursively
+gsettings list-keys org.gnome.desktop.interface
+=end
+
+# list OSs - flavours
+# multiple vms with same config - array of hostnames
+#  for loop for entries in array
+
+flavour_hash = Hash[
+  "ubuntu_desktop" => {
+    :gui => true,
+    :box => "chenhan/ubuntu-desktop-20.04",
+    :box_version => "20200424",
+  },
+  "ubuntu_minimal" => {
+    :gui => false,
+    :box => "geerlingguy/ubuntu2004",
+    :box_version => "1.0.3",
+  },
+  "centos_desktop" => {
+    :gui => true,
+    :box => "esss/centos-7.1-desktop",
+    :box_version => "1.0.3",
+  },
+  "centos_minimal" => {
+    :gui => false,
+    :box => "generic/centos8",
+    :box_version => "3.6.4",
+  },
+]
+
+servers=[
+  {
+    :gui => flavour_hash["ubuntu_desktop"][:gui],
+    :hostname => "controller.mitkar.io",
+    :ip => "192.168.0.6",
+    :box => flavour_hash["ubuntu_desktop"][:box],
+    :box_version => flavour_hash["ubuntu_desktop"][:box_version],
+    :ram => 1024,
+    :vram => 128,
+    :cpu => 2
+  },
+  {
+    :gui => flavour_hash["ubuntu_desktop"][:gui],
+    :hostname => "backend-01.mitkar.io",
+    :ip => "192.168.0.7",
+    :box => flavour_hash["ubuntu_desktop"][:box],
+    :box_version => flavour_hash["ubuntu_desktop"][:box_version],
+    :ram => 1024,
+    :vram => 128,
+    :cpu => 2
+  },
+  {
+    :gui => flavour_hash["ubuntu_desktop"][:gui],
+    :hostname => "backend-02.mitkar.io",
+    :ip => "192.168.0.8",
+    :box => flavour_hash["ubuntu_desktop"][:box],
+    :box_version => flavour_hash["ubuntu_desktop"][:box_version],
+    :ram => 1024,
+    :vram => 128,
+    :cpu => 2
+  },
+  {
+    :gui => flavour_hash["ubuntu_desktop"][:gui],
+    :hostname => "backend-03.mitkar.io",
+    :ip => "192.168.0.9",
+    :box => flavour_hash["ubuntu_desktop"][:box],
+    :box_version => flavour_hash["ubuntu_desktop"][:box_version],
+    :ram => 1024,
+    :vram => 128,
+    :cpu => 2
+  },
+]
+
+$ADDUSERSCRIPT = <<-SCRIPT
+sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+sudo systemctl restart sshd
+username=raktim
+password=raktim
+sudo useradd -p $(openssl passwd -crypt $password) -m -s /bin/bash $username
+sudo usermod -aG sudo $username
+#sudo usermod -aG wheel $username
+#sudo apt install ubuntu-desktop-minimal -y
+SCRIPT
+
+$DELUSERSCRIPT = <<-SCRIPT
+# removing user from '/etc/passwd' removes user from login screen
+sudo usermod --expiredate 1 vagrant
+sudo sed -i '/vagrant/d' /etc/passwd
+#sudo service gdm3 restart
+# for proper cleanup run this command on first login
+#sudo userdel -r vagrant
+SCRIPT
+
+$GUISCRIPT = <<-SCRIPT
+# This is an executable.
+# Usage: ./customgui.sh
+guiscript=customgui.sh
+# Getting Wallpaper
+#wallpaper_loc=$(pwd)/wallpaper.png
+#wget -O $wallpaper_loc "<image-link>"
+wallpaper_loc="/usr/share/backgrounds/brad-huchteman-stone-mountain.jpg"
+
+cat > $guiscript <<EOF
+# Setting Favourite apps
+dconf write /org/gnome/shell/favorite-apps "['firefox.desktop', 'org.gnome.Nautilus.desktop', 'code_code.desktop', 'org.gnome.Terminal.desktop']"
+# Setting Background
+gsettings set org.gnome.desktop.background picture-uri file://$wallpaper_loc
+# Setting Scale
+gsettings set org.gnome.desktop.interface text-scaling-factor 1.15
+# Moving Taskbar to bottom
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+# Setting theme
+gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+gsettings set org.gnome.desktop.interface cursor-theme 'DMZ-White'
+# Setting Font
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'FreeMono Bold 12'
+gsettings set org.gnome.desktop.interface monospace-font-name 'FreeMono Bold 12'
+gsettings set org.gnome.desktop.interface document-font-name 'FreeMono Bold 12'
+gsettings set org.gnome.desktop.interface font-name 'FreeMono Bold 12'
+EOF
+sudo chmod 777 $guiscript
+mv ./$guiscript /home/raktim/$guiscript
+SCRIPT
+
+$BASICPKGSCRIPT = <<-SCRIPT
+# Install basic packages
+sudo apt install curl git openssh-server openssh-client -y
+# Install vscode
+sudo snap install code --classic
+SCRIPT
+
+$REFRESHSCRIPT = <<-SCRIPT
+# Refresh packages
+sudo apt update
+sudo apt upgrade -y
+sudo apt autoremove -y
+SCRIPT
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  servers.each do |machine|
+      config.vm.define machine[:hostname] do |node|
+          if Vagrant.has_plugin? "vagrant-vbguest"
+            config.vbguest.no_install  = true
+            config.vbguest.auto_update = false
+            config.vbguest.no_remote   = true
+          end
+          node.vm.box = machine[:box]
+          #node.vm.box_version = machine[:box_version]
+          node.vm.hostname = machine[:hostname]
+          node.vm.network "public_network", ip: machine[:ip]
+          node.vm.provider "virtualbox" do |vb|
+              vb.gui = machine[:gui]
+              # Oracle VM VirtualBox Manager -> File -> Preferences -> General -> Default Machine Folder
+              vb.customize ["setproperty", "machinefolder", 'default']
+              # General.basic
+              vb.customize ["modifyvm", :id, "--name", machine[:hostname]]
+              # General.Advanced
+              vb.customize ["modifyvm", :id, "--clipboard-mode", "bidirectional"]
+              vb.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+              # System.Motherboard
+              vb.customize ["modifyvm", :id, "--memory", machine[:ram]]
+              # Display.Screen
+              vb.customize ["modifyvm", :id, "--vram", machine[:vram]]
+              vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+              vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+              # VRDE = VirtualBox Remote Desktop Extension
+              vb.customize ["modifyvm", :id, "--vrde", "off"]
+          end
+          node.vm.provision :shell, :inline => $ADDUSERSCRIPT, run: "always"
+          node.vm.provision :shell, :inline => $BASICPKGSCRIPT, run: "always"
+          # N.B. careful with following script in case setup is sensitive
+          #node.vm.provision :shell, :inline => $REFRESHSCRIPT, run: "always"
+          if machine[:gui] == true then
+            node.vm.provision :shell, :inline => $GUISCRIPT, run: "always"
+          end
+          node.vm.provision :shell, :inline => $DELUSERSCRIPT, run: "always"
+      end
+  end
+end
