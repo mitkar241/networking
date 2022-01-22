@@ -1,6 +1,5 @@
 cd ..
 sudo apt install resolvconf -y
-cd networking/dns/
 sudo cp ./etc/resolvconf/resolv.conf.d/head /etc/resolvconf/resolv.conf.d/head
 sudo resolvconf --enable-updates
 sudo resolvconf -u
