@@ -14,5 +14,6 @@ ns1	IN	A	192.168.0.6
 controller	IN	A	192.168.0.6
 backend-01	IN	A	192.168.0.7
 backend-02	IN	A	192.168.0.8
-backend-03      IN      A       192.168.0.9
+backend-03	IN	A	192.168.0.9
+backend-03	IN	A	192.168.0.10
 @	IN	AAAA	::1
