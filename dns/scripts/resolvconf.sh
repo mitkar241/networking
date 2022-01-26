@@ -15,7 +15,7 @@ function resolv_ubuntu() {
 
 function resolv_centos() {
   new_lines="dns=none\n#plugins=ifcfg-rh,ibft"
-  sudo sed -i "s/#plugins=ifcfg-rh,ibft/$new_lines/" /etc/NetworkManager/NetworkManager.conf
+  sudo sed -i "s/#plugins=ifcfg-rh/$new_lines/" /etc/NetworkManager/NetworkManager.conf
   sudo systemctl restart NetworkManager.service
   sudo cp ./etc/resolv.conf /etc/resolv.conf
 }
