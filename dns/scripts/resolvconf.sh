@@ -1,8 +1,38 @@
-cd ..
-sudo apt install resolvconf -y
-sudo cp ./etc/resolvconf/resolv.conf.d/head /etc/resolvconf/resolv.conf.d/head
-sudo resolvconf --enable-updates
-sudo resolvconf -u
+#!/bin/bash
+
+<<DESC
+@ FileName   : resolvconf.sh
+@ Description: Addition of permanent nameservers in resolv.conf
+@ Usage      : bash resolvconf.sh
+DESC
+
+function resolv_ubuntu() {
+  sudo apt install resolvconf -y
+  sudo cp ./etc/resolvconf/resolv.conf.d/head /etc/resolvconf/resolv.conf.d/head
+  sudo resolvconf --enable-updates
+  sudo resolvconf -u
+}
+
+function resolv_centos() {
+  new_lines="dns=none\n#plugins=ifcfg-rh,ibft"
+  sudo sed -i "s/#plugins=ifcfg-rh,ibft/$new_lines/" /etc/NetworkManager/NetworkManager.conf
+  sudo systemctl restart NetworkManager.service
+  sudo cp ./etc/resolv.conf /etc/resolv.conf
+}
+
+function main() {
+  cd ..
+  source /etc/os-release
+  if [[ "$ID_LIKE" == "debian" && "$ID" == "ubuntu" ]]; then
+    resolv_ubuntu
+  elif [[ "$ID_LIKE" == "rhel fedora" && "$ID" == "centos" ]]; then
+    resolv_centos
+  else
+    echo "Unknown OS / Flavour"
+  fi
+}
+
+main "$@"
 
 # TEST 1:
 #cat /etc/resolv.conf
