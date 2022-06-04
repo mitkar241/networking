@@ -6,9 +6,9 @@
 // organization
 //include "/etc/bind/zones.rfc1918";
 //forward lookup zone
-zone "mitkar.io" IN {
+zone "mitkar241.io" IN {
 	type master;
-	file "/etc/bind/db.mitkar.io";
+	file "/etc/bind/db.mitkar241.io";
 };
 
 // reverse lookup zone
