@@ -59,12 +59,12 @@ main "$@"
 #
 
 # TEST 3:
-#nslookup controller.mitkar.io
+#nslookup control-01.ctrl.mitkar241.io
 # Expected Output:
-#Server:		192.168.0.6
-#Address:	192.168.0.6#53
+#Server:		192.168.0.3
+#Address:	192.168.0.3#53
 #
-#Name:	controller.mitkar.io
-#Address: 192.168.0.6
+#Name:	control-01.ctrl.mitkar241.io
+#Address: 192.168.0.3
 #
 
