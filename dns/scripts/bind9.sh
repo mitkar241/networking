@@ -13,15 +13,15 @@ sudo cp ./etc/bind/db.* /etc/bind/
 #
 
 # TEST 2:
-#named-checkzone mitkar.io db.mitkar.io
+#named-checkzone mitkar241.io db.mitkar241.io
 # Expected Output:
-#zone mitkar.io/IN: loaded serial 2
+#zone mitkar241.io/IN: loaded serial 2
 #OK
 
 # TEST 3:
 #named-checkzone 0.168.192.in-addr.arpa db.0.168.192
 # Expected Output:
-#zone mitkar.io/IN: loaded serial 2
+#zone mitkar241.io/IN: loaded serial 2
 #OK
 
 sudo service bind9 restart
@@ -41,12 +41,12 @@ sudo service bind9 restart
 #
 
 # TEST 5:
-#nslookup controller.mitkar.io
+#nslookup control-01.ctrl.mitkar241.io
 # Expected Output:
-#Server:	192.168.0.6
-#Address:	192.168.0.6#53
+#Server:	192.168.0.3
+#Address:	192.168.0.3#53
 #
-#Name:	controller.mitkar.io
-#Address: 192.168.0.6
+#Name:	control-01.ctrl.mitkar241.io
+#Address: 192.168.0.3
 #
 
