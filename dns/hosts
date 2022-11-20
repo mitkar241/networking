@@ -23,14 +23,14 @@
 ####################
 # mitkar241.io DNS entries
 ####################
+# controllers
+192.168.0.3     ctrl-comp01.ctrl.mitkar241.io
+192.168.0.4     ctrl-comp02.ctrl.mitkar241.io
+192.168.0.5     ctrl-comp03.ctrl.mitkar241.io
 # applications
-192.168.0.3     apps-comp01.apps.mitkar241.io
-192.168.0.4     apps-comp02.apps.mitkar241.io
-192.168.0.5     apps-comp03.apps.mitkar241.io
-# controller
-192.168.0.6     ctrl-comp01.ctrl.mitkar241.io
-192.168.0.7     ctrl-comp02.ctrl.mitkar241.io
-192.168.0.8     ctrl-comp03.ctrl.mitkar241.io
+192.168.0.6     apps-comp01.apps.mitkar241.io
+192.168.0.7     apps-comp02.apps.mitkar241.io
+192.168.0.8     apps-comp03.apps.mitkar241.io
 # development
 192.168.0.9     devs-comp01.devs.mitkar241.io
 192.168.0.10    devs-comp02.devs.mitkar241.io
