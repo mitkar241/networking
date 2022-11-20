@@ -12,9 +12,9 @@ Added Windows `host` file.
 ## Current Plan  / Setup
 ---
 ```
-####################
+# ###################
 # mitkar241.io DNS entries
-####################
+# ###################
 # applications
 192.168.0.3     apps-comp01.apps.mitkar241.io
 192.168.0.4     apps-comp02.apps.mitkar241.io
